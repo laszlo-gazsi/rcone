@@ -17,6 +17,7 @@ module RCone
       match_data = method.to_s.scan reg_exp
       
       raise UndefinedMethodException unless match_data.size > 0
+      raise UndefinedFieldException unless @rb_fields.has_key? match_data[0][1].to_sym
       
       handle_operation match_data[0][0], match_data[0][1], arguments[0] || nil   
     end
@@ -26,7 +27,7 @@ module RCone
     def handle_operation operation, field, value
       case operation
         when GET then get_value field
-        when SET then set_value field, arguments[0]
+        when SET then set_value field, value
       end
     end
     
@@ -48,7 +49,7 @@ module RCone
     
     def check_required field, value, required
       if required.include?(field) && value.nil?
-        raise MissingParameterException.new "Parameter #{param} is undefined!"
+        raise RCone::MissingParameterException.new "Parameter #{field} is undefined!"
       end
     end
     
